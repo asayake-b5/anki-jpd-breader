@@ -1,3 +1,9 @@
+# Anki Web Reader Extension
+
+This is a fork of [jpd-breader](https://github.com/max-kamps/jpd-breader), but tweaked for anki.
+
+The majority of the credit should go to this repository, so go check it out! I’ll leave the old readme past mine.
+
 # JPDB Web Reader Extension
 
 A browser extension that parses any text in your browser using JPDB, and allows you to mine new vocabulary from any page!
