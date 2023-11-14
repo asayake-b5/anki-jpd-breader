@@ -33,10 +33,13 @@ export function invoke(action: String, params = {}) {
 }
 
 export function toCardState(card: any): CardState {
-    let r: CardState = ['new'];
+    let r: CardState = ['not-in-deck'];
     if (card) {
         switch (card.type) {
             // -- 0=new, 1=learning, 2=review, 3=relearning
+            case 0:
+                r = ['new'];
+                break;
             case 1:
             case 3:
                 r = ['learning'];
