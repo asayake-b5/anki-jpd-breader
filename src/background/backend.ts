@@ -113,8 +113,7 @@ export async function parse(text: string[]): Response<[Token[][], Card[]]> {
         let id = 0;
         //TODO Asayake put this in settings
         const ankiCard = ankiCards.find(card => card.fields['Word'].value == spelling);
-        if (ankiCard) id = ankiCard.id;
-        // console.log(ankiCard);
+        if (ankiCard) id = ankiCard.cardId;
         return {
             id: id, //TODO FIXME Asayake handle 0 better?
             spelling,
@@ -161,10 +160,10 @@ export async function parse(text: string[]): Response<[Token[][], Card[]]> {
 }
 
 const REVIEW_GRADES = {
-    again: '1',
-    hard: '2',
-    good: '4',
-    easy: '5',
+    again: 1,
+    hard: 2,
+    good: 3,
+    easy: 4,
 };
 export async function review(id: number, rating: keyof typeof REVIEW_GRADES): Response {
     await invoke('answerCards', {
@@ -179,29 +178,12 @@ export async function review(id: number, rating: keyof typeof REVIEW_GRADES): Re
 }
 
 export async function getCardState(id: number): Response<CardState> {
-    //TODO Asayake remake this?
+    const r = (await invoke('cardsInfo', {
+        cards: [id],
+    })) as any[];
+    if (r[0]) {
+        return [toCardState(r[0]), 0];
+    }
 
-    // const options = {
-    //     method: 'POST',
-    //     headers: {
-    //         'Content-Type': 'application/json',
-    //         Authorization: `Bearer ${config.apiToken}`,
-    //         Accept: 'application/json',
-    //     },
-    //     body: JSON.stringify({
-    //         list: [[vid, sid]],
-    //         fields: ['card_state'],
-    //     }),
-    // };
-    // const response = await fetch('https://jpdb.io/api/v1/lookup-vocabulary', options);
-    // if (!(200 <= response.status && response.status <= 299)) {
-    //     const data = (await response.json()) as JpdbError;
-    //     throw Error(`${data.error_message} while getting state for word ${vid}/${sid}`);
-    // }
-    // type MapFieldTuple<Tuple extends readonly [...(keyof Fields)[]], Fields> = { [I in keyof Tuple]: Fields[Tuple[I]] };
-    // const data = (await response.json()) as { vocabulary_info: [MapFieldTuple<['card_state'], VocabFields> | null] };
-    // const vocabInfo = data.vocabulary_info[0];
-    // if (vocabInfo === null) throw Error(`Can't get state for word ${vid}/${sid}, word does not exist`);
-    // return [vocabInfo[0] ?? ['not-in-deck'], API_RATELIMIT];
-    return [['not-in-deck'], API_RATELIMIT];
+    return [['not-in-deck'], 0];
 }
