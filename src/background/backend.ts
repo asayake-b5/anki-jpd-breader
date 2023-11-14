@@ -1,6 +1,7 @@
 import { Card, CardState, DeckId, Token } from '../types.js';
 import { assertNonNull, truncate } from '../util.js';
 import { config } from './background.js';
+import { invoke, toCardState } from './anki-connect.js';
 
 const API_RATELIMIT = 0.2; // seconds between requests
 const SCRAPE_RATELIMIT = 1.1; // seconds between requests
@@ -107,6 +108,17 @@ export async function parse(text: string[]): Response<[Token[][], Card[]]> {
         vocabulary: MapFieldTuple<typeof VOCAB_FIELDS, VocabFields>[];
     };
 
+    //TODO Asayake change query from within settings?
+    //TODO Asayake anki ignore list deck, ala blacklist?
+    const query = data.vocabulary.map(word => `Word:${word[3]} `).join(' OR ');
+
+    const ankiCards: any[] = await invoke('findCards', 6, { query }).then(async cards => {
+        const r = await invoke('cardsInfo', 6, {
+            cards,
+        });
+        return r as any[];
+    });
+
     const cards: Card[] = data.vocabulary.map(vocab => {
         // NOTE: If you change these, make sure to change VOCAB_FIELDS too
         const [
@@ -119,10 +131,11 @@ export async function parse(text: string[]): Response<[Token[][], Card[]]> {
             partOfSpeech,
             meaningsChunks,
             meaningsPartOfSpeech,
-            cardState,
+            _cardState,
             pitchAccent,
         ] = vocab;
-
+        //TODO Asayake put this in settings
+        const ankiCard = ankiCards.find(card => card.fields['Word'].value == spelling);
         return {
             vid,
             sid,
@@ -132,7 +145,7 @@ export async function parse(text: string[]): Response<[Token[][], Card[]]> {
             frequencyRank,
             partOfSpeech,
             meanings: meaningsChunks.map((glosses, i) => ({ glosses, partOfSpeech: meaningsPartOfSpeech[i] })),
-            state: cardState ?? ['not-in-deck'],
+            state: toCardState(ankiCard),
             pitchAccent: pitchAccent ?? [], // HACK not documented... in case it can be null, better safe than sorry
         };
     });
@@ -372,6 +385,7 @@ export async function review(vid: number, sid: number, rating: keyof typeof REVI
 }
 
 export async function getCardState(vid: number, sid: number): Response<CardState> {
+    //TODO Asayake remake this?
     const options = {
         method: 'POST',
         headers: {
