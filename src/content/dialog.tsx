@@ -1,6 +1,6 @@
 import { jsxCreateElement } from '../jsx.js';
 import { assertNonNull, browser } from '../util.js';
-import { config, requestMine, requestReview } from './background_comms.js';
+import { config, requestReview } from './background_comms.js';
 import { getSentences, JpdbWordData } from './word.js';
 
 export class Dialog {
@@ -33,22 +33,22 @@ export class Dialog {
                 }}></div>
         );
 
-        const add = async (rating?: 'nothing' | 'something' | 'hard' | 'good' | 'easy' | 'fail' | 'pass') => {
-            assertNonNull(this.#data);
+        /* const add = async (rating?: 'nothing' | 'something' | 'hard' | 'good' | 'easy' | 'fail' | 'pass') => {
+*     assertNonNull(this.#data);
 
-            await requestMine(
-                this.#data.token.card,
-                addToForq.checked,
-                this.#sentence.innerText.trim() || undefined,
-                translation.innerText.trim() || undefined,
-            );
+*     await requestMine(
+*         this.#data.token.card,
+*         addToForq.checked,
+*         this.#sentence.innerText.trim() || undefined,
+*         translation.innerText.trim() || undefined,
+*     );
 
-            if (rating) {
-                await requestReview(this.#data.token.card, rating);
-            }
+*     if (rating) {
+*         await requestReview(this.#data.token.card, rating);
+*     }
 
-            this.closeModal();
-        };
+*     this.closeModal();
+* }; */
 
         const shadow = this.#element.attachShadow({ mode: 'closed' });
 
@@ -101,27 +101,27 @@ export class Dialog {
                         <button class='cancel' onclick={() => this.closeModal()}>
                             Cancel
                         </button>
-                        <button class='add' onclick={async () => await add()}>
+                        {/* <button class='add' onclick={async () => await add()}>
                             Add
-                        </button>
+                        </button> */}
                     </div>
                     <div>
                         Add and review
-                        <button class='nothing' onclick={async () => await add('nothing')}>
+                        {/* <button class='nothing' onclick={async () => await add('nothing')}>
                             Nothing
-                        </button>
-                        <button class='something' onclick={async () => await add('something')}>
+                        </button> */}
+                        {/* <button class='something' onclick={async () => await add('something')}>
                             Something
-                        </button>
-                        <button class='hard' onclick={async () => await add('hard')}>
+                        </button> */}
+                        {/* <button class='hard' onclick={async () => await add('hard')}>
                             Hard
-                        </button>
-                        <button class='good' onclick={async () => await add('good')}>
+                        </button> */}
+                        {/* <button class='good' onclick={async () => await add('good')}>
                             Good
-                        </button>
-                        <button class='easy' onclick={async () => await add('easy')}>
+                        </button> */}
+                        {/* <button class='easy' onclick={async () => await add('easy')}>
                             Easy
-                        </button>
+                        </button> */}
                     </div>
                 </article>
             </div>,
@@ -133,15 +133,13 @@ export class Dialog {
 
         const card = this.#data.token.card;
 
-        const url = `https://jpdb.io/vocabulary/${card.vid}/${encodeURIComponent(card.spelling)}/${encodeURIComponent(
-            card.reading,
-        )}`;
+        const url = 'https://example.com';
 
         // FIXME(Security) not escaped
         this.#header.replaceChildren(
             <a href={url} target='_blank'>
                 <span class='spelling'>{card.spelling}</span>
-                <span class='reading'>{card.spelling !== card.reading ? card.reading : ''}</span>
+                {/* <span class='reading'>{card.spelling !== card.reading ? card.reading : ''}</span> */}
             </a>,
         );
 

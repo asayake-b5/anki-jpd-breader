@@ -43,15 +43,15 @@ function requestUnabortable<T extends Omit<ContentToBackgroundMessage, 'seq'>>(m
 }
 
 export function requestSetFlag(card: Card, flag: 'blacklist' | 'never-forget' | 'forq', state: boolean) {
-    return requestUnabortable({ type: 'setFlag', vid: card.vid, sid: card.sid, flag, state });
+    return requestUnabortable({ type: 'setFlag', id: card.id, flag, state });
 }
 
-export function requestMine(card: Card, forq: boolean, sentence?: string, translation?: string) {
-    return requestUnabortable({ type: 'mine', forq, vid: card.vid, sid: card.sid, sentence, translation });
-}
+// export function requestMine(card: Card, forq: boolean, sentence?: string, translation?: string) {
+//     return requestUnabortable({ type: 'mine', forq, vid: card.vid, sid: card.sid, sentence, translation });
+// }
 
 export function requestReview(card: Card, rating: Grade) {
-    return requestUnabortable({ type: 'review', rating, vid: card.vid, sid: card.sid });
+    return requestUnabortable({ type: 'review', rating, id: card.id });
 }
 
 export function requestUpdateConfig() {
@@ -138,11 +138,10 @@ port.onMessage.addListener((message: BackgroundToContentMessage, port) => {
 
         case 'updateWordState':
             {
-                for (const [vid, sid, state] of message.words) {
-                    const idx = reverseIndex.get(`${vid}/${sid}`);
-                    if (idx === undefined) continue;
-
+                for (const [id, state] of message.words) {
                     const className = `jpdb-word ${state.join(' ')}`;
+                    const idx = reverseIndex.get(`${id}`);
+                    if (idx === undefined) continue;
                     if (idx.className === className) continue;
 
                     for (const element of idx.elements) {

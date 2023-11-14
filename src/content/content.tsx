@@ -1,5 +1,5 @@
 import { Keybind } from '../background/config.js';
-import { config, requestMine, requestReview, requestSetFlag } from './background_comms.js';
+import { config, requestReview, requestSetFlag } from './background_comms.js';
 import { Dialog } from './dialog.js';
 import { Popup } from './popup.js';
 import { showError } from './toast.js';
@@ -32,12 +32,12 @@ async function hotkeyListener(event: KeyboardEvent | MouseEvent) {
             const card = word.jpdbData.token.card;
 
             if (matchesHotkey(event, config.addKey)) {
-                await requestMine(
-                    word.jpdbData.token.card,
-                    config.forqOnMine,
-                    getSentences(word.jpdbData, config.contextWidth).trim() || undefined,
-                    undefined,
-                );
+                /* await requestMine(
+                 *     word.jpdbData.token.card,
+                 *     config.forqOnMine,
+                 *     getSentences(word.jpdbData, config.contextWidth).trim() || undefined,
+                 *     undefined,
+                 * ); */
             }
 
             if (matchesHotkey(event, config.dialogKey)) {
@@ -59,14 +59,15 @@ async function hotkeyListener(event: KeyboardEvent | MouseEvent) {
                 await requestSetFlag(card, 'never-forget', !card.state.includes('never-forget'));
             }
 
+            //TODO Asayake change this
             if (matchesHotkey(event, config.nothingKey)) {
                 event.preventDefault();
-                await requestReview(card, 'nothing');
+                await requestReview(card, 'again');
             }
 
             if (matchesHotkey(event, config.somethingKey)) {
                 event.preventDefault();
-                await requestReview(card, 'something');
+                await requestReview(card, 'again');
             }
 
             if (matchesHotkey(event, config.hardKey)) {

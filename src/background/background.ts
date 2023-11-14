@@ -51,20 +51,21 @@ function enqueue<T>(func: () => backend.Response<T>): Promise<T> {
     });
 }
 
-export async function addToDeck(vid: number, sid: number, deckId: DeckId) {
-    return enqueue(() => backend.addToDeck(vid, sid, deckId));
+// export async function addToDeck(vid: number, sid: number, deckId: DeckId) {
+//     return enqueue(() => backend.addToDeck(vid, sid, deckId));
+// }
+//
+// export async function removeFromDeck(vid: number, sid: number, deckId: DeckId) {
+//     return enqueue(() => backend.removeFromDeck(vid, sid, deckId));
+// }
+// export async function setSentence(vid: number, sid: number, sentence?: string, translation?: string) {
+//     return enqueue(() => backend.setSentence(vid, sid, sentence, translation));
+// }
+export async function review(id: number, rating: Grade) {
+    return enqueue(() => backend.review(id, rating));
 }
-export async function removeFromDeck(vid: number, sid: number, deckId: DeckId) {
-    return enqueue(() => backend.removeFromDeck(vid, sid, deckId));
-}
-export async function setSentence(vid: number, sid: number, sentence?: string, translation?: string) {
-    return enqueue(() => backend.setSentence(vid, sid, sentence, translation));
-}
-export async function review(vid: number, sid: number, rating: Grade) {
-    return enqueue(() => backend.review(vid, sid, rating));
-}
-export async function getCardState(vid: number, sid: number) {
-    return enqueue(() => backend.getCardState(vid, sid));
+export async function getCardState(id: number) {
+    return enqueue(() => backend.getCardState(id));
 }
 
 const maxParseLength = 16384;
@@ -98,7 +99,7 @@ async function batchParses() {
             handle.resolve(tokens[i]);
         }
 
-        broadcast({ type: 'updateWordState', words: cards.map(card => [card.vid, card.sid, card.state]) });
+        broadcast({ type: 'updateWordState', words: cards.map(card => [card.id, card.state]) });
 
         return [null, timeout] as [null, number];
     } catch (error) {
@@ -152,8 +153,8 @@ function onPortDisconnect(port: browser.runtime.Port) {
     ports.delete(port);
 }
 
-async function broadcastNewWordState(vid: number, sid: number) {
-    broadcast({ type: 'updateWordState', words: [[vid, sid, await getCardState(vid, sid)]] });
+async function broadcastNewWordState(id: number) {
+    broadcast({ type: 'updateWordState', words: [[id, await getCardState(id)]] });
 }
 
 // Chrome can't send Error objects over background ports, so we have to serialize and deserialize them...
@@ -195,62 +196,24 @@ const messageHandlers: {
     },
 
     async setFlag(request, port) {
-        const deckId = request.flag === 'blacklist' ? config.blacklistDeckId : config.neverForgetDeckId;
-
-        if (deckId === null) {
-            throw Error(`No deck ID set for ${request.flag}, check the settings page`);
-        }
-
-        if (request.state === true) {
-            await addToDeck(request.vid, request.sid, deckId);
-        } else {
-            await removeFromDeck(request.vid, request.sid, deckId);
-        }
-
-        postResponse(port, request, null);
-        await broadcastNewWordState(request.vid, request.sid);
+        //TODO Asayake make this
+        // const deckId = request.flag === 'blacklist' ? config.blacklistDeckId : config.neverForgetDeckId;
+        // if (deckId === null) {
+        //     throw Error(`No deck ID set for ${request.flag}, check the settings page`);
+        // }
+        // if (request.state === true) {
+        //     await addToDeck(request.vid, request.sid, deckId);
+        // } else {
+        //     await removeFromDeck(request.vid, request.sid, deckId);
+        // }
+        // postResponse(port, request, null);
+        // await broadcastNewWordState(request.id);
     },
 
     async review(request, port) {
-        await review(request.vid, request.sid, request.rating);
+        await review(request.id, request.rating);
         postResponse(port, request, null);
-        await broadcastNewWordState(request.vid, request.sid);
-    },
-
-    async mine(request, port) {
-        if (config.miningDeckId === null) {
-            throw Error(`No mining deck ID set, check the settings page`);
-        }
-
-        if (request.forq && config.forqDeckId === null) {
-            throw Error(`No forq deck ID set, check the settings page`);
-        }
-
-        // Safety: This is safe, because we early-errored for this condition
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        await addToDeck(request.vid, request.sid, config.miningDeckId!);
-
-        if (request.sentence || request.translation) {
-            await setSentence(
-                request.vid,
-                request.sid,
-                request.sentence ?? undefined,
-                request.translation ?? undefined,
-            );
-        }
-
-        if (request.forq) {
-            // Safety: This is safe, because we early-errored for this condition
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            await addToDeck(request.vid, request.sid, config.forqDeckId!);
-        }
-
-        if (request.review) {
-            await review(request.vid, request.sid, request.review);
-        }
-
-        postResponse(port, request, null);
-        await broadcastNewWordState(request.vid, request.sid);
+        await broadcastNewWordState(request.id);
     },
 };
 

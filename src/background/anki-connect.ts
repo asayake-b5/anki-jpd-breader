@@ -1,6 +1,8 @@
 import { CardState } from '../types.js';
 
-export function invoke(action: String, version: Number, params = {}) {
+const ANKI_CONNECT_VERSION = 6;
+
+export function invoke(action: String, params = {}) {
     return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.addEventListener('error', () => reject('failed to issue request'));
@@ -26,7 +28,7 @@ export function invoke(action: String, version: Number, params = {}) {
         });
 
         xhr.open('POST', 'http://127.0.0.1:8765');
-        xhr.send(JSON.stringify({ action, version, params }));
+        xhr.send(JSON.stringify({ action, version: ANKI_CONNECT_VERSION, params }));
     });
 }
 

@@ -1,6 +1,6 @@
 import { browser, clamp, nonNull } from '../util.js';
 import { jsxCreateElement } from '../jsx.js';
-import { config, requestMine, requestReview, requestSetFlag } from './background_comms.js';
+import { config, requestReview, requestSetFlag } from './background_comms.js';
 import { Dialog } from './dialog.js';
 import { getSentences, JpdbWord, JpdbWordData } from './word.js';
 
@@ -285,16 +285,9 @@ export class Popup {
                     <button
                         class='nothing'
                         onclick={
-                            demoMode ? undefined : async () => await requestReview(this.#data.token.card, 'nothing')
+                            demoMode ? undefined : async () => await requestReview(this.#data.token.card, 'again')
                         }>
-                        Nothing
-                    </button>
-                    <button
-                        class='something'
-                        onclick={
-                            demoMode ? undefined : async () => await requestReview(this.#data.token.card, 'something')
-                        }>
-                        Something
+                        Again
                     </button>
                     <button
                         class='hard'
@@ -354,106 +347,104 @@ export class Popup {
 
         const card = this.#data.token.card;
 
-        const url = `https://jpdb.io/vocabulary/${card.vid}/${encodeURIComponent(card.spelling)}/${encodeURIComponent(
-            card.reading,
-        )}`;
+        const url = 'https://example.com';
 
         // Group meanings by part of speech
         const groupedMeanings: { partOfSpeech: string[]; glosses: string[][]; startIndex: number }[] = [];
         let lastPOS: string[] = [];
-        for (const [index, meaning] of card.meanings.entries()) {
-            if (
-                // Same part of speech as previous meaning?
-                meaning.partOfSpeech.length == lastPOS.length &&
-                meaning.partOfSpeech.every((p, i) => p === lastPOS[i])
-            ) {
-                // Append to previous meaning group
-                groupedMeanings[groupedMeanings.length - 1].glosses.push(meaning.glosses);
-            } else {
-                // Create a new meaning group
-                groupedMeanings.push({
-                    partOfSpeech: meaning.partOfSpeech,
-                    glosses: [meaning.glosses],
-                    startIndex: index,
-                });
-                lastPOS = meaning.partOfSpeech;
-            }
-        }
+        /* for (const [index, meaning] of card.meanings.entries()) {
+*     if (
+*         // same part of speech as previous meaning?
+*         meaning.partofspeech.length == lastpos.length &&
+*         meaning.partOfSpeech.every((p, i) => p === lastPOS[i])
+*     ) {
+*         // Append to previous meaning group
+*         groupedMeanings[groupedMeanings.length - 1].glosses.push(meaning.glosses);
+*     } else {
+*         // Create a new meaning group
+*         groupedMeanings.push({
+*             partOfSpeech: meaning.partOfSpeech,
+*             glosses: [meaning.glosses],
+*             startIndex: index,
+*         });
+*         lastPOS = meaning.partOfSpeech;
+*     }
+* }
 
-        this.#vocabSection.replaceChildren(
-            <div id='header'>
-                <a lang='ja' href={url} target='_blank'>
-                    <span class='spelling'>{card.spelling}</span>
-                    <span class='reading'>{card.spelling !== card.reading ? `(${card.reading})` : ''}</span>
-                </a>
-                <div class='state'>
-                    {card.state.map(s => (
-                        <span class={s}>{s}</span>
-                    ))}
-                </div>
-            </div>,
-            <div class='metainfo'>
-                <span class='freq'>{card.frequencyRank ? `Top ${card.frequencyRank}` : ''}</span>
-                {card.pitchAccent.map(pitch => renderPitch(card.reading, pitch))}
-            </div>,
-            ...groupedMeanings.flatMap(meanings => [
-                <h2>
-                    {meanings.partOfSpeech
-                        .map(pos => PARTS_OF_SPEECH[pos] ?? `(Unknown part of speech #${pos}, please report)`)
-                        .filter(x => x.length > 0)
-                        .join(', ')}
-                </h2>,
-                <ol start={meanings.startIndex + 1}>
-                    {meanings.glosses.map(glosses => (
-                        <li>{glosses.join('; ')}</li>
-                    ))}
-                </ol>,
-            ]),
-        );
+* this.#vocabSection.replaceChildren(
+*     <div id='header'>
+*         <a lang='ja' href={url} target='_blank'>
+*             <span class='spelling'>{card.spelling}</span>
+*             <span class='reading'>{card.spelling !== card.reading ? `(${card.reading})` : ''}</span>
+*         </a>
+*         <div class='state'>
+*             {card.state.map(s => (
+*                 <span class={s}>{s}</span>
+*             ))}
+*         </div>
+*     </div>,
+*     <div class='metainfo'>
+*         <span class='freq'>{card.frequencyRank ? `Top ${card.frequencyRank}` : ''}</span>
+*         {card.pitchAccent.map(pitch => renderPitch(card.reading, pitch))}
+*     </div>,
+*     ...groupedMeanings.flatMap(meanings => [
+*         <h2>
+*             {meanings.partOfSpeech
+*                 .map(pos => PARTS_OF_SPEECH[pos] ?? `(Unknown part of speech #${pos}, please report)`)
+*                 .filter(x => x.length > 0)
+*                 .join(', ')}
+*         </h2>,
+*         <ol start={meanings.startIndex + 1}>
+*             {meanings.glosses.map(glosses => (
+*                 <li>{glosses.join('; ')}</li>
+*             ))}
+*         </ol>,
+*     ]),
+* );
 
-        const blacklisted = card.state.includes('blacklisted');
-        const neverForget = card.state.includes('never-forget');
+* const blacklisted = card.state.includes('blacklisted');
+* const neverForget = card.state.includes('never-forget');
 
-        this.#mineButtons.replaceChildren(
-            <button
-                class='add'
-                onclick={
-                    this.#demoMode
-                        ? undefined
-                        : () =>
-                              requestMine(
-                                  this.#data.token.card,
-                                  config.forqOnMine,
-                                  getSentences(this.#data, config.contextWidth).trim() || undefined,
-                                  undefined,
-                              )
-                }>
-                Add
-            </button>,
-            <button
-                class='edit-add-review'
-                onclick={this.#demoMode ? undefined : () => Dialog.get().showForWord(this.#data)}>
-                Edit, Add and Review...
-            </button>,
-            <button
-                class='blacklist'
-                onclick={
-                    this.#demoMode
-                        ? undefined
-                        : async () => await requestSetFlag(this.#data.token.card, 'blacklist', !blacklisted)
-                }>
-                {!blacklisted ? 'Blacklist' : 'Remove from blacklist'}
-            </button>,
-            <button
-                class='never-forget'
-                onclick={
-                    this.#demoMode
-                        ? undefined
-                        : async () => await requestSetFlag(this.#data.token.card, 'never-forget', !neverForget)
-                }>
-                {!neverForget ? 'Never forget' : 'Unmark as never forget'}
-            </button>,
-        );
+* this.#mineButtons.replaceChildren(
+*     <button
+*         class='add'
+*         onclick={
+*             this.#demoMode
+*                 ? undefined
+*                 : () =>
+*                       requestMine(
+*                           this.#data.token.card,
+*                           config.forqOnMine,
+*                           getSentences(this.#data, config.contextWidth).trim() || undefined,
+*                           undefined,
+*                       )
+*         }>
+*         Add
+*     </button>,
+*     <button
+*         class='edit-add-review'
+*         onclick={this.#demoMode ? undefined : () => Dialog.get().showForWord(this.#data)}>
+*         Edit, Add and Review...
+*     </button>,
+*     <button
+*         class='blacklist'
+*         onclick={
+*             this.#demoMode
+*                 ? undefined
+*                 : async () => await requestSetFlag(this.#data.token.card, 'blacklist', !blacklisted)
+*         }>
+*         {!blacklisted ? 'Blacklist' : 'Remove from blacklist'}
+*     </button>,
+*     <button
+*         class='never-forget'
+*         onclick={
+*             this.#demoMode
+*                 ? undefined
+*                 : async () => await requestSetFlag(this.#data.token.card, 'never-forget', !neverForget)
+*         }>
+*         {!neverForget ? 'Never forget' : 'Unmark as never forget'}
+*     </button>,
+* ); */
     }
 
     setData(data: JpdbWordData) {

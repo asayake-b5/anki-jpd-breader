@@ -19,30 +19,9 @@ const POPUP_EXAMPLE_DATA: JpdbWordData = {
         length: 0,
         rubies: [],
         card: {
-            vid: 1386060,
-            sid: 1337383451,
-            rid: 0,
+            id: 0,
             spelling: '設定',
-            reading: 'せってい',
-            pitchAccent: ['LHHHH'],
-            meanings: [
-                {
-                    partOfSpeech: ['n', 'vs'],
-                    glosses: [
-                        'establishment',
-                        'creation',
-                        'posing (a problem)',
-                        'setting (movie, novel, etc.)',
-                        'scene',
-                    ],
-                },
-                {
-                    partOfSpeech: ['n', 'vs'],
-                    glosses: ['options setting', 'preference settings', 'configuration', 'setup'],
-                },
-            ],
             state: ['locked', 'new'],
-            frequencyRank: 2400,
         },
     },
 };

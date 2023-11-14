@@ -100,6 +100,7 @@ function wrap(node: Node, wrapper: HTMLElement) {
     wrapper.append(node);
 }
 
+//TODO asayake change that to number directly?
 export const reverseIndex = new Map<string, { className: string; elements: JpdbWord[] }>();
 export function applyTokens(fragments: Paragraph, tokens: Token[]) {
     // console.log('Applying results:', fragments, tokens);
@@ -146,9 +147,9 @@ export function applyTokens(fragments: Paragraph, tokens: Token[]) {
                 )
             ) as JpdbWord;
 
-            const idx = reverseIndex.get(`${token.card.vid}/${token.card.sid}`);
+            const idx = reverseIndex.get(`${token.card.id}`);
             if (idx === undefined) {
-                reverseIndex.set(`${token.card.vid}/${token.card.sid}`, { className, elements: [wrapper] });
+                reverseIndex.set(`${token.card.id}`, { className, elements: [wrapper] });
             } else {
                 idx.elements.push(wrapper);
             }

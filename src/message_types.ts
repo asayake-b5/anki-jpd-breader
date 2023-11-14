@@ -10,8 +10,7 @@ export type ContentToBackgroundMessage =
     | UpdateConfigRequest
     | ParseRequest
     | SetFlagRequest
-    | ReviewRequest
-    | MineRequest;
+    | ReviewRequest;
 
 export type BackgroundToContentMessage =
     | UpdateConfigCommand
@@ -51,29 +50,16 @@ export type ParseRequest = {
 export type SetFlagRequest = {
     type: 'setFlag';
     seq: number;
-    vid: number;
-    sid: number;
-    flag: 'forq' | 'blacklist' | 'never-forget';
+    id: number;
+    flag: 'blacklist' | 'never-forget';
     state: boolean;
 };
 
 export type ReviewRequest = {
     type: 'review';
     seq: number;
-    vid: number;
-    sid: number;
+    id: number;
     rating: Grade;
-};
-
-export type MineRequest = {
-    type: 'mine';
-    seq: number;
-    vid: number;
-    sid: number;
-    forq: boolean;
-    sentence: string | null;
-    translation: string | null;
-    review: Grade;
 };
 
 type ResponseCommon = {
@@ -107,5 +93,5 @@ export type UpdateConfigCommand = {
 
 export type UpdateWordStateCommand = {
     type: 'updateWordState';
-    words: [number, number, CardState][];
+    words: [number, CardState][];
 };
