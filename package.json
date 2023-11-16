@@ -1,6 +1,6 @@
 {
-    "name": "jpd-breader",
-    "version": "13.0",
+    "name": "anki-breader",
+    "version": "14.0",
     "scripts": {
         "preinstall": "git config core.hooksPath ./scripts/git_hooks",
         "format": "ts-node --esm scripts/format.ts",

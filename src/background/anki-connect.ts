@@ -2,7 +2,7 @@ import { CardState } from '../types.js';
 
 const ANKI_CONNECT_VERSION = 6;
 
-export function invoke(action: String, params = {}) {
+export function invoke(action: string, params = {}) {
     return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.addEventListener('error', () => reject('failed to issue request'));

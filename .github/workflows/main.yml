@@ -11,13 +11,19 @@ jobs:
         steps:
             - name: 'Checkout'
               uses: actions/checkout@v1
-
+            - name: Setup Node
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 16
+            - run: npm install
+            # - run: npm run check
+            - run: node --no-warnings --loader ts-node/esm scripts/build.ts
             - name: 'web-ext build'
               id: web-ext-build
               uses: kewisch/action-web-ext@v1
               with:
                   cmd: build
-                  source: src
+                  source: build
 
             - name: 'web-ext sign'
               id: web-ext-sign
