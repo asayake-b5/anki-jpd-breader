@@ -9,7 +9,7 @@ export type Config = {
     schemaVersion: number;
 
     apiToken: string | null;
-
+    ankiWordField: string | null;
 
     customWordCSS: string;
     customPopupCSS: string;
@@ -31,7 +31,7 @@ export const defaultConfig: Config = {
     schemaVersion: CURRENT_SCHEMA_VERSION,
 
     apiToken: null,
-
+    ankiWordField: 'Word',
 
     customWordCSS: '',
     customPopupCSS: '',

@@ -98,7 +98,7 @@ export async function parse(text: string[]): Response<[Token[][], Card[]]> {
 
     //TODO Asayake change query from within settings?
     //TODO Asayake anki ignore list deck, ala blacklist?
-    const query = data.vocabulary.map(word => `Word:${word[0]} `).join(' OR ');
+    const query = data.vocabulary.map(word => `${config.ankiWordField}:${word[0]} `).join(' OR ');
 
     const ankiCards: any[] = await invoke('findCards', { query }).then(async cards => {
         const r = await invoke('cardsInfo', {
@@ -111,8 +111,7 @@ export async function parse(text: string[]): Response<[Token[][], Card[]]> {
         // NOTE: If you change these, make sure to change VOCAB_FIELDS too
         const [spelling] = vocab;
         let id = 0;
-        //TODO Asayake put this in settings
-        const ankiCard = ankiCards.find(card => card.fields['Word'].value == spelling);
+        const ankiCard = ankiCards.find(card => card.fields[config.ankiWordField ?? 'Word'].value == spelling);
         if (ankiCard) id = ankiCard.cardId;
         return {
             id: id, //TODO FIXME Asayake handle 0 better?
