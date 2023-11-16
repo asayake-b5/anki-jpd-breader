@@ -31,19 +31,6 @@ async function hotkeyListener(event: KeyboardEvent | MouseEvent) {
             const [word, x, y] = currentHover;
             const card = word.jpdbData.token.card;
 
-            if (matchesHotkey(event, config.addKey)) {
-                /* await requestMine(
-                 *     word.jpdbData.token.card,
-                 *     config.forqOnMine,
-                 *     getSentences(word.jpdbData, config.contextWidth).trim() || undefined,
-                 *     undefined,
-                 * ); */
-            }
-
-            if (matchesHotkey(event, config.dialogKey)) {
-                Dialog.get().showForWord(word.jpdbData);
-            }
-
             if (matchesHotkey(event, config.showPopupKey)) {
                 event.preventDefault();
                 Popup.get().showForWord(word, x, y);
@@ -60,12 +47,7 @@ async function hotkeyListener(event: KeyboardEvent | MouseEvent) {
             }
 
             //TODO Asayake change this
-            if (matchesHotkey(event, config.nothingKey)) {
-                event.preventDefault();
-                await requestReview(card, 'again');
-            }
-
-            if (matchesHotkey(event, config.somethingKey)) {
+            if (matchesHotkey(event, config.againKey)) {
                 event.preventDefault();
                 await requestReview(card, 'again');
             }

@@ -10,13 +10,6 @@ export type Config = {
 
     apiToken: string | null;
 
-    miningDeckId: DeckId | null;
-    forqDeckId: DeckId | null;
-    blacklistDeckId: DeckId | null;
-    neverForgetDeckId: DeckId | null;
-
-    contextWidth: number;
-    forqOnMine: boolean;
 
     customWordCSS: string;
     customPopupCSS: string;
@@ -26,12 +19,9 @@ export type Config = {
     disableFadeAnimation: boolean;
 
     showPopupKey: Keybind;
-    addKey: Keybind;
-    dialogKey: Keybind;
     blacklistKey: Keybind;
     neverForgetKey: Keybind;
-    nothingKey: Keybind;
-    somethingKey: Keybind;
+    againKey: Keybind;
     hardKey: Keybind;
     goodKey: Keybind;
     easyKey: Keybind;
@@ -42,12 +32,6 @@ export const defaultConfig: Config = {
 
     apiToken: null,
 
-    miningDeckId: null,
-    forqDeckId: 'forq',
-    blacklistDeckId: 'blacklist',
-    neverForgetDeckId: 'never-forget',
-    contextWidth: 1,
-    forqOnMine: true,
 
     customWordCSS: '',
     customPopupCSS: '',
@@ -57,12 +41,9 @@ export const defaultConfig: Config = {
     disableFadeAnimation: false,
 
     showPopupKey: { key: 'Shift', code: 'ShiftLeft', modifiers: [] },
-    addKey: null,
-    dialogKey: null,
     blacklistKey: null,
     neverForgetKey: null,
-    nothingKey: null,
-    somethingKey: null,
+    againKey: null,
     hardKey: null,
     goodKey: null,
     easyKey: null,
@@ -92,8 +73,7 @@ export function migrateSchema(config: Config) {
             'showPopupKey',
             'blacklistKey',
             'neverForgetKey',
-            'nothingKey',
-            'somethingKey',
+            'againKey',
             'hardKey',
             'goodKey',
             'easyKey',

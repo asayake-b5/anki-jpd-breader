@@ -91,9 +91,9 @@ export class Dialog {
                         <label>
                             Also add to FORQ:{' '}
                             {
-                                (addToForq = (
-                                    <input type='checkbox' id='add-to-forq' checked={config.forqOnMine} />
-                                ) as HTMLInputElement)
+                                (addToForq = {
+                                    /* <input type='checkbox' id='add-to-forq' checked={config.forqOnMine} /> */
+                                } as HTMLInputElement)
                             }
                         </label>
                     </div>
@@ -156,7 +156,7 @@ export class Dialog {
 
     setData(data: JpdbWordData) {
         this.#data = data;
-        this.#contextWidth = config.contextWidth;
+        /* this.#contextWidth = config.contextWidth; */
         this.render();
     }
 
